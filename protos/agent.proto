@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package mirage;
+
+service AgentService {
+    rpc Register (SystemInfo) returns (RegisterResponse) {}
+    rpc Checkin (CheckinRequest) returns (CheckinResponse) {}
+    rpc GetTasks (TaskRequest) returns (TaskResponse) {}
+    rpc SendResult (TaskResult) returns (ResultResponse) {}
+    rpc SendFile (stream FileChunk) returns (FileResponse) {}
+}
+
+message SystemInfo {
+    string hostname = 1;
+    string username = 2;
+    string os = 3;
+    string arch = 4;
+    string pid = 5;
+    string domain = 6;
+    string agent_id = 7;
+}
+
+message RegisterResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message CheckinRequest {
+    string agent_id = 1;
+}
+
+message CheckinResponse {
+    bool has_tasks = 1;
+}
+
+message TaskRequest {
+    string agent_id = 1;
+}
+
+message Task {
+    string id = 1;
+    string command = 2;
+    string created = 3;
+}
+
+message TaskResponse {
+    repeated Task tasks = 1;
+}
+
+message TaskResult {
+    string task_id = 1;
+    string output = 2;
+    string status = 3;
+    optional string error = 4;
+    string agent_id = 5;
+}
+
+message ResultResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message FileChunk {
+    string file_id = 1;
+    string file_name = 2;
+    bytes content = 3;
+    bool is_last = 4;
+    string agent_id = 5;
+}
+
+message FileResponse {
+    bool success = 1;
+    string message = 2;
+} 
