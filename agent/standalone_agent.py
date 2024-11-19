@@ -18,11 +18,11 @@ from protos import agent_pb2
 from protos import agent_pb2_grpc
 
 class Agent:
-    def __init__(self, server_address):
+    def __init__(self, server_address, ca_cert=None):
         self.server_address = server_address
         self.agent_id = str(uuid.uuid4())
         
-        # Create insecure channel credentials
+        # Create channel options
         options = [
             ('grpc.keepalive_time_ms', 10000),
             ('grpc.keepalive_timeout_ms', 5000),
@@ -33,10 +33,21 @@ class Agent:
             ('grpc.ssl_target_name_override', 'merlin.rahulr.in'),
         ]
         
-        # Create channel with SSL verification disabled
-        credentials = grpc.ssl_channel_credentials()
+        # Load CA certificate if provided
+        if ca_cert:
+            try:
+                with open(ca_cert, 'rb') as f:
+                    ca_cert_data = f.read()
+                credentials = grpc.ssl_channel_credentials(root_certificates=ca_cert_data)
+                print(f"Using CA certificate from: {ca_cert}")
+            except Exception as e:
+                print(f"Error loading CA certificate: {e}")
+                print("Falling back to default SSL verification")
+                credentials = grpc.ssl_channel_credentials()
+        else:
+            credentials = grpc.ssl_channel_credentials()
         
-        # Create composite channel credentials
+        # Create secure channel
         self.channel = grpc.secure_channel(
             server_address,
             credentials,
@@ -189,9 +200,11 @@ def main():
     parser = argparse.ArgumentParser(description='GRPC Agent')
     parser.add_argument('--server', default='localhost:50051',
                         help='The server address in format host:port')
+    parser.add_argument('--ca-cert', 
+                        help='Path to CA certificate file (e.g., ZScaler certificate)')
     args = parser.parse_args()
     
-    agent = Agent(args.server)
+    agent = Agent(args.server, args.ca_cert)
     agent.run()
     
 if __name__ == '__main__':
