@@ -1,0 +1,6 @@
+grpcio>=1.68.0
+grpcio-tools>=1.68.0
+prompt-toolkit>=3.0.0
+protobuf>=4.25.0
+cryptography>=42.0.0
+pyinstaller>=6.3.0 
