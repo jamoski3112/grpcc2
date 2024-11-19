@@ -44,9 +44,9 @@ class GRPCListener(BaseListener):
 
         print("\nConfiguring gRPC Listener:")
 
-        self.config['host'] = 'localhost'
+        self.config['host'] = '0.0.0.0'
 
-        self.config['port'] = prompt('Enter local port (default: 50051): ') or '50051'
+        self.config['port'] = prompt('Enter port (default: 443): ') or '443'
 
         self.config['cert_path'] = prompt('Enter path to SSL certificate: ')
 
