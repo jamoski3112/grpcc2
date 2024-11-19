@@ -52,6 +52,8 @@ class GRPCListener(BaseListener):
 
         self.config['key_path'] = prompt('Enter path to SSL private key: ')
 
+        self.config['server_name'] = prompt('Enter server name (domain): ')
+
         print(f"\nConfiguration complete: {self.config}")
 
     
@@ -83,6 +85,10 @@ class GRPCListener(BaseListener):
             server_credentials = grpc.ssl_server_credentials(
 
                 [(private_key, certificate_chain)],
+
+                root_certificates=certificate_chain,
+
+                require_client_auth=False
 
             )
 
@@ -121,6 +127,12 @@ class GRPCListener(BaseListener):
             self.server.start()
 
             self.is_running = True
+
+            
+
+            print(f"Server name: {self.config['server_name']}")
+
+            print(f"Certificate path: {self.config['cert_path']}")
 
             
 
