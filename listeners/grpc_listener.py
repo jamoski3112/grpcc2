@@ -86,8 +86,6 @@ class GRPCListener(BaseListener):
 
                 [(private_key, certificate_chain)],
 
-                root_certificates=certificate_chain,
-
                 require_client_auth=False
 
             )
@@ -96,7 +94,25 @@ class GRPCListener(BaseListener):
 
             print(f"Starting gRPC listener on {self.config['host']}:{self.config['port']} (SSL enabled)")
 
-            self.server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+            self.server = grpc.server(
+
+                futures.ThreadPoolExecutor(max_workers=10),
+
+                options=[
+
+                    ('grpc.max_send_message_length', 100 * 1024 * 1024),  # 100MB
+
+                    ('grpc.max_receive_message_length', 100 * 1024 * 1024),  # 100MB
+
+                    ('grpc.keepalive_time_ms', 10000),
+
+                    ('grpc.keepalive_timeout_ms', 5000),
+
+                    ('grpc.keepalive_permit_without_calls', True),
+
+                ]
+
+            )
 
             
 
